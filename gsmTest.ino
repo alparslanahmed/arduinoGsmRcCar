@@ -1,6 +1,6 @@
 // include the GSM library
 #include <GSM.h>
-#include <MQTT.h>
+#include <ArduinoMqttClient.h>
 
 // PIN number if necessary
 #define PINNUMBER ""
@@ -13,22 +13,42 @@
 GSMClient net;
 GPRS gprs;
 GSM gsmAccess;
-MQTTClient client;
+MqttClient mqttClient(net);
+
+//set interval for sending messages (milliseconds)
+
+const long interval = 8000;
+
+unsigned long previousMillis = 0;
+
+
+int count = 0;
+
+
+const char broker[] = "162.55.170.36";
+
+int        port     = 1883;
+
+const char topic[]  = "deneme_kanal";
+
+const char topic2[]  = "deneme_kanal_2";
+
+const char topic3[]  = "deneme_kanal_3";
+
+const char forwards[] = "w";
+const char backwards[] = "s";
+const char left[] = "a";
+const char right[] = "d";
+
+int steer = 1;
+int gas = 1;
+
+const int leftF = 8;
+const int leftB = 9;
+const int rightF = 10;
+const int rightB = 11;
 
 unsigned long lastMillis = 0;
-
-void connect() {
-  Serial.print("\nconnecting...");
-  while (!client.connect("arduino", "test", "test")) {
-    Serial.print(".");
-    delay(1000);
-  }
-
-  Serial.println("\nconnected!");
-
-  client.subscribe("/hello");
-  // client.unsubscribe("/hello");
-}
 
 void messageReceived(String &topic, String &payload) {
   Serial.println("incoming: " + topic + " - " + payload);
@@ -39,8 +59,20 @@ void messageReceived(String &topic, String &payload) {
   // or push to a queue and handle it in the loop after calling `client.loop()`.
 }
 void setup() {
+
+  pinMode(leftF, OUTPUT);
+  pinMode(leftB, OUTPUT);
+  pinMode(rightF, OUTPUT);
+  pinMode(rightB, OUTPUT);
+  
   Serial.begin(115200);
 
+
+  digitalWrite(leftF, LOW);
+  digitalWrite(leftB, LOW);
+  digitalWrite(rightF, LOW);
+  digitalWrite(rightB, LOW);
+      
   // connection state
   bool connected = false;
 
@@ -52,6 +84,7 @@ void setup() {
     if ((gsmAccess.begin() == GSM_READY) &&
         (gprs.attachGPRS(apn, login, password) == GPRS_READY)) {
       connected = true;
+      Serial.print("\nGSM READY!!!");
     } else {
       Serial.print(".");
       delay(1000);
@@ -59,24 +92,120 @@ void setup() {
   }
 
   Serial.print("\nconnecting...");
-  // Note: Local domain names (e.g. "Computer.local" on OSX) are not supported
-  // by Arduino. You need to set the IP address directly.
-  client.setHost("deneme");
-  client.begin("pee2556b.us-east-1.emqx.cloud",15829, net);
-  client.onMessage(messageReceived);
 
-  connect();
+  Serial.print("Attempting to connect to the MQTT broker: ");
+
+  Serial.println(broker);
+
+
+  if (!mqttClient.connect(broker, port)) {
+
+    Serial.print("MQTT connection failed! Error code = ");
+
+    Serial.println(mqttClient.connectError());
+
+
+    while (1);
+
+  }
+  
+  mqttClient.onMessage(onMqttMessage);
+
+  Serial.println("You're connected to the MQTT broker!");
+  mqttClient.subscribe("deneme_kanal");
+  Serial.print("Waiting for messages");
+
 }
 void loop() {
-  client.loop();
+  mqttClient.poll();
+}
 
-  if (!client.connected()) {
-    connect();
+
+void onMqttMessage(int messageSize) {
+  // we received a message, print out the topic and contents
+  Serial.println("Received a message with topic '");
+  Serial.print(mqttClient.messageTopic());
+  Serial.print("', length ");
+  Serial.print(messageSize);
+  Serial.println(" bytes:");
+
+  // use the Stream interface to print the contents
+  while (mqttClient.available()) {
+  
+    String data = mqttClient.readString();
+
+    Serial.println(data);
+    
+    if(data.length() == 1 &&  data == forwards){
+      gas += 1;
+
+      if(gas > 2){
+        gas = 2;
+        }
+    }
+
+    if(data.length() == 1 &&  data == backwards){
+      gas -= 1;
+
+      if(gas < 0){
+        gas = 0;
+        }
+    }
+
+    if(data.length() == 1 &&  data == left){
+       steer += 1;
+
+      if(steer > 2){
+        steer = 2;
+        }
+    }
+    
+    if(data.length() == 1 &&  data == right){
+       steer -= 1;
+
+      if(steer < 0){
+        steer = 0;
+      }
+    }
   }
 
-  // publish a message roughly every second.
-  if (millis() - lastMillis > 1000) {
-    lastMillis = millis();
-    client.publish("/hello", "world");
+  if(gas == 0){
+     digitalWrite(leftF, HIGH);
+     digitalWrite(leftB, LOW);
   }
+
+  if(gas == 1){
+     digitalWrite(leftF, LOW);
+     digitalWrite(leftB, LOW);
+  }
+
+  if(gas == 2){
+     digitalWrite(leftF, LOW);
+     digitalWrite(leftB, HIGH);
+  }
+
+  Serial.println(gas);
+
+  if(steer == 0){
+     digitalWrite(rightF, HIGH);
+     digitalWrite(rightB, LOW);
+  }
+
+  if(steer == 1){
+     digitalWrite(rightF, LOW);
+     digitalWrite(rightB, LOW);
+  }
+
+  if(steer == 2){
+     digitalWrite(rightF, LOW);
+     digitalWrite(rightB, HIGH);
+  }
+
+  delay(250);
+
+  digitalWrite(leftF, LOW);
+  digitalWrite(leftB, LOW);
+  digitalWrite(rightF, LOW);
+  digitalWrite(rightB, LOW);
+
 }
