@@ -25,6 +25,8 @@ unsigned long previousMillis = 0;
 int count = 0;
 
 
+
+
 const char broker[] = "162.55.170.36";
 
 int        port     = 1883;
