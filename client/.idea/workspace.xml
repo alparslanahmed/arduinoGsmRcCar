@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a241bd31-83ce-4968-a795-b29ab9abcaff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../gsmTest.ino" beforeDir="false" afterPath="$PROJECT_DIR$/../gsmTest.ino" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gsmTest.ino" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +31,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/home/alparslan/code/kahve",
+    "last_opened_file_path": "/home/alparslan/code/tombalaSvelte",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   }
@@ -45,6 +46,8 @@
       <updated>1658949353683</updated>
       <workItem from="1658949355201" duration="2321000" />
       <workItem from="1659040363757" duration="340000" />
+      <workItem from="1659901054854" duration="1460000" />
+      <workItem from="1660063889228" duration="14000" />
     </task>
     <servers />
   </component>

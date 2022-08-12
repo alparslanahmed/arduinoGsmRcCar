@@ -24,9 +24,6 @@ unsigned long previousMillis = 0;
 
 int count = 0;
 
-
-
-
 const char broker[] = "162.55.170.36";
 
 int        port     = 1883;
@@ -70,8 +67,8 @@ void setup() {
   Serial.begin(115200);
 
 
-  digitalWrite(leftF, LOW);
-  digitalWrite(leftB, LOW);
+  digitalWrite(leftF, HIGH);
+  digitalWrite(leftB, HIGH);
   digitalWrite(rightF, LOW);
   digitalWrite(rightB, LOW);
       
@@ -172,8 +169,11 @@ void onMqttMessage(int messageSize) {
   }
 
   if(gas == 0){
+     digitalWrite(leftF, LOW);
+     digitalWrite(leftB, HIGH);
+     delay(250);
      digitalWrite(leftF, HIGH);
-     digitalWrite(leftB, LOW);
+     digitalWrite(leftB, HIGH);
   }
 
   if(gas == 1){
@@ -182,14 +182,22 @@ void onMqttMessage(int messageSize) {
   }
 
   if(gas == 2){
-     digitalWrite(leftF, LOW);
+    digitalWrite(leftF, HIGH);
+     digitalWrite(leftB, LOW);
+     delay(250);
+     digitalWrite(leftF, HIGH);
      digitalWrite(leftB, HIGH);
   }
 
   Serial.println(gas);
 
   if(steer == 0){
+     digitalWrite(leftF, LOW);
+     digitalWrite(leftB, LOW);
      digitalWrite(rightF, HIGH);
+     digitalWrite(rightB, LOW);
+     delay(1000);
+     digitalWrite(rightF, LOW);
      digitalWrite(rightB, LOW);
   }
 
@@ -199,15 +207,13 @@ void onMqttMessage(int messageSize) {
   }
 
   if(steer == 2){
+     digitalWrite(leftF, LOW);
+     digitalWrite(leftB, LOW);
      digitalWrite(rightF, LOW);
      digitalWrite(rightB, HIGH);
+     delay(1000);
+     digitalWrite(rightF, LOW);
+     digitalWrite(rightB, LOW);
   }
-
-  delay(250);
-
-  digitalWrite(leftF, LOW);
-  digitalWrite(leftB, LOW);
-  digitalWrite(rightF, LOW);
-  digitalWrite(rightB, LOW);
 
 }
